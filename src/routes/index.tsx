@@ -34,7 +34,7 @@ const products = [
     normalPrice: 110,
     salePrice: 80,
     description: "Heavyweight 450GSM Organic Cotton",
-    carouselStartIndex: 1,
+    carouselStartIndex: 0,
     tagColor: "bg-brand-white text-brand-black",
   },
   {
@@ -49,32 +49,44 @@ const products = [
   },
 ];
 
-const productGallerySlides = [
-  {
-    src: carouselPulloverFront,
-    alt: "Black Agni pullover hoodie front view",
-    label: "Pullover Front",
-  },
-  {
-    src: carouselZipupFront,
-    alt: "Black Vayu zip-up hoodie front view",
-    label: "Zip-Up Front",
-  },
-  {
-    src: carouselBackView,
-    alt: "Black hoodie back profile view",
-    label: "Back View",
-  },
-] as const;
+const productSlideMap = {
+  "vayu-zipup": [
+    {
+      src: carouselZipupFront,
+      alt: "Black Vayu zip-up hoodie front view",
+      label: "Zip-Up Front",
+    },
+    {
+      src: carouselBackView,
+      alt: "Black zip-up hoodie back view",
+      label: "Back View",
+    },
+  ],
+  "agni-pullover": [
+    {
+      src: carouselPulloverFront,
+      alt: "Black Agni pullover hoodie front view",
+      label: "Pullover Front",
+    },
+    {
+      src: carouselBackView,
+      alt: "Black pullover hoodie back view",
+      label: "Back View",
+    },
+  ],
+} as const;
 
-function ProductImageCarousel({ startIndex = 0 }: { startIndex?: number }) {
+type ProductSlide = (typeof productSlideMap)[keyof typeof productSlideMap][number];
+
+function ProductImageCarousel({ productId, startIndex = 0 }: { productId: string; startIndex?: number }) {
+  const slides = productSlideMap[productId as keyof typeof productSlideMap] as readonly ProductSlide[];
   const [activeSlide, setActiveSlide] = useState(startIndex);
 
   useEffect(() => {
     setActiveSlide(startIndex);
   }, [startIndex]);
 
-  const totalSlides = productGallerySlides.length;
+  const totalSlides = slides.length;
 
   const goToSlide = (index: number) => {
     setActiveSlide((index + totalSlides) % totalSlides);
@@ -90,7 +102,7 @@ function ProductImageCarousel({ startIndex = 0 }: { startIndex?: number }) {
 
   return (
     <div className="relative w-full h-[54vh] sm:h-[58vh] md:h-[60vh] lg:h-[34rem] xl:h-[36rem] bg-brand-grey overflow-hidden ring-1 ring-white/5">
-      {productGallerySlides.map((slide, index) => (
+      {slides.map((slide, index) => (
         <img
           key={slide.label}
           src={slide.src}
@@ -107,11 +119,11 @@ function ProductImageCarousel({ startIndex = 0 }: { startIndex?: number }) {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-black/65 via-brand-black/10 to-transparent" />
 
       <div className="absolute left-4 bottom-4 px-3 py-1.5 bg-brand-black/75 backdrop-blur-sm ring-1 ring-white/20 text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-brand-white">
-        {productGallerySlides[activeSlide]?.label}
+        {slides[activeSlide]?.label}
       </div>
 
       <div className="absolute right-4 bottom-4 flex items-center gap-2">
-        {productGallerySlides.map((slide, index) => (
+        {slides.map((slide, index) => (
           <button
             key={slide.label}
             type="button"
@@ -1212,7 +1224,7 @@ function Index() {
           {products.map((product) => (
             <div key={product.id} className="group">
               <div className="relative overflow-hidden mb-6">
-                <ProductImageCarousel startIndex={product.carouselStartIndex} />
+                <ProductImageCarousel productId={product.id} startIndex={product.carouselStartIndex} />
                 <div className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold uppercase ${product.tagColor}`}>
                   {product.type}
                 </div>
