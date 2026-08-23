@@ -8,8 +8,9 @@ import nodemailer from "nodemailer";
 import { SIZES, stockLabel, useInventory, type Size } from "@/lib/inventory";
 import { addStockSubscriber, sendSubscriptionConfirmationEmail } from "@/lib/stock-updates";
 import heroHoodie from "@/assets/hero-hoodie.jpg";
-import zipupHoodie from "@/assets/zipup-hoodie.jpg";
-import pulloverHoodie from "@/assets/pullover-hoodie.jpg";
+import carouselPulloverFront from "@/assets/carousel-pullover-front.jpeg";
+import carouselZipupFront from "@/assets/carousel-zipup-front.png";
+import carouselBackView from "@/assets/carousel-back-view.jpeg";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -50,17 +51,17 @@ const products = [
 
 const productGallerySlides = [
   {
-    src: pulloverHoodie,
+    src: carouselPulloverFront,
     alt: "Black Agni pullover hoodie front view",
     label: "Pullover Front",
   },
   {
-    src: zipupHoodie,
+    src: carouselZipupFront,
     alt: "Black Vayu zip-up hoodie front view",
     label: "Zip-Up Front",
   },
   {
-    src: heroHoodie,
+    src: carouselBackView,
     alt: "Black hoodie back profile view",
     label: "Back View",
   },
@@ -88,7 +89,7 @@ function ProductImageCarousel({ startIndex = 0 }: { startIndex?: number }) {
   };
 
   return (
-    <div className="relative w-full aspect-[3/4] bg-brand-grey overflow-hidden ring-1 ring-white/5">
+    <div className="relative w-full h-[54vh] sm:h-[58vh] md:h-[60vh] lg:h-[34rem] xl:h-[36rem] bg-brand-grey overflow-hidden ring-1 ring-white/5">
       {productGallerySlides.map((slide, index) => (
         <img
           key={slide.label}
