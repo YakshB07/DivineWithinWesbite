@@ -33,8 +33,7 @@ const products = [
     normalPrice: 110,
     salePrice: 80,
     description: "Heavyweight 450GSM Organic Cotton",
-    image: zipupHoodie,
-    imageAlt: "Black Vayu zip-up hoodie with red accents",
+    carouselStartIndex: 1,
     tagColor: "bg-brand-white text-brand-black",
   },
   {
@@ -44,11 +43,107 @@ const products = [
     normalPrice: 100,
     salePrice: 70,
     description: "Oversized Fit, Embroidered Mantra",
-    image: pulloverHoodie,
-    imageAlt: "Black Agni pullover hoodie with red Hindu mantra embroidery",
+    carouselStartIndex: 0,
     tagColor: "bg-brand-red text-brand-white",
   },
 ];
+
+const productGallerySlides = [
+  {
+    src: pulloverHoodie,
+    alt: "Black Agni pullover hoodie front view",
+    label: "Pullover Front",
+  },
+  {
+    src: zipupHoodie,
+    alt: "Black Vayu zip-up hoodie front view",
+    label: "Zip-Up Front",
+  },
+  {
+    src: heroHoodie,
+    alt: "Black hoodie back profile view",
+    label: "Back View",
+  },
+] as const;
+
+function ProductImageCarousel({ startIndex = 0 }: { startIndex?: number }) {
+  const [activeSlide, setActiveSlide] = useState(startIndex);
+
+  useEffect(() => {
+    setActiveSlide(startIndex);
+  }, [startIndex]);
+
+  const totalSlides = productGallerySlides.length;
+
+  const goToSlide = (index: number) => {
+    setActiveSlide((index + totalSlides) % totalSlides);
+  };
+
+  const goPrev = () => {
+    goToSlide(activeSlide - 1);
+  };
+
+  const goNext = () => {
+    goToSlide(activeSlide + 1);
+  };
+
+  return (
+    <div className="relative w-full aspect-[3/4] bg-brand-grey overflow-hidden ring-1 ring-white/5">
+      {productGallerySlides.map((slide, index) => (
+        <img
+          key={slide.label}
+          src={slide.src}
+          alt={slide.alt}
+          width={1024}
+          height={1232}
+          className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
+            index === activeSlide ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
+          }`}
+          loading="lazy"
+        />
+      ))}
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-black/65 via-brand-black/10 to-transparent" />
+
+      <div className="absolute left-4 bottom-4 px-3 py-1.5 bg-brand-black/75 backdrop-blur-sm ring-1 ring-white/20 text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-brand-white">
+        {productGallerySlides[activeSlide]?.label}
+      </div>
+
+      <div className="absolute right-4 bottom-4 flex items-center gap-2">
+        {productGallerySlides.map((slide, index) => (
+          <button
+            key={slide.label}
+            type="button"
+            onClick={() => goToSlide(index)}
+            aria-label={`Go to ${slide.label}`}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              index === activeSlide ? "w-7 bg-brand-white" : "w-3 bg-brand-white/40 hover:bg-brand-white/70"
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-3">
+        <button
+          type="button"
+          onClick={goPrev}
+          aria-label="Previous image"
+          className="size-8 sm:size-9 grid place-items-center rounded-full bg-brand-black/65 text-brand-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-brand-black/80 transition-colors"
+        >
+          <span className="text-base leading-none">‹</span>
+        </button>
+        <button
+          type="button"
+          onClick={goNext}
+          aria-label="Next image"
+          className="size-8 sm:size-9 grid place-items-center rounded-full bg-brand-black/65 text-brand-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-brand-black/80 transition-colors"
+        >
+          <span className="text-base leading-none">›</span>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const ORDERS_STORAGE_KEY = "tdw-orders-v1";
 type PaymentProcessingStore = {
@@ -1116,16 +1211,7 @@ function Index() {
           {products.map((product) => (
             <div key={product.id} className="group">
               <div className="relative overflow-hidden mb-6">
-                <div className="w-full aspect-[3/4] bg-brand-grey overflow-hidden ring-1 ring-white/5">
-                  <img
-                    src={product.image}
-                    alt={product.imageAlt}
-                    width={1024}
-                    height={1232}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
+                <ProductImageCarousel startIndex={product.carouselStartIndex} />
                 <div className={`absolute top-4 left-4 px-3 py-1 text-xs font-bold uppercase ${product.tagColor}`}>
                   {product.type}
                 </div>
