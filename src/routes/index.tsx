@@ -482,7 +482,15 @@ const sendOrderEmail = createServerFn({ method: "POST" })
     const smtpPort = Number(process.env["SMTP_PORT"] ?? "587");
     const smtpUser = process.env["SMTP_USER"]?.trim();
     const smtpPass = process.env["SMTP_PASS"]?.trim();
-    const toAddress = process.env["ORDER_EMAIL_TO"]?.trim() ?? "OPinox007@gmail.com";
+    // Always notify the OPinox inbox in addition to any ORDER_EMAIL_TO addresses (deduped).
+    const toAddress = [
+      ...new Map(
+        [...(process.env["ORDER_EMAIL_TO"] ?? "").split(","), "OPinox007@gmail.com"]
+          .map((address) => address.trim())
+          .filter(Boolean)
+          .map((address) => [address.toLowerCase(), address] as const),
+      ).values(),
+    ];
     const fromAddress = process.env["SMTP_FROM"]?.trim() ?? smtpUser ?? "no-reply@thedivinewithin.com";
 
       if (!smtpHost || !smtpUser || !smtpPass) {
